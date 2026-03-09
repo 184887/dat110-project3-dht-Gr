@@ -56,7 +56,7 @@ public class FileManager {
 		this.chordnode = chordnode;
 	}
 	
-	public void createReplicaFiles() {
+	public void createReplicaFiles() throws NoSuchAlgorithmException {
 	 	
 		// set a loop where size = numReplicas
 		
@@ -66,6 +66,12 @@ public class FileManager {
 		
 		// store the hash in the replicafiles array.
 
+        for(int i = 0 ;i < Util.numReplicas; i++){
+
+            String repFileName = filename + i;
+
+            replicafiles[i] = Hash.hashOf(repFileName);
+        }
 
 	}
 	
