@@ -65,6 +65,8 @@ public class FileManager {
 		// hash the replica
 		
 		// store the hash in the replicafiles array.
+
+
 	}
 	
     /**

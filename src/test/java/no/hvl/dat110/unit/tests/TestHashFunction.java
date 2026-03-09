@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class TestHashFunction {
 	 * Test method for {@link no.hvl.dat110.util.Hash#hashOf(java.lang.String)}.
 	 */
 	@Test
-	void testHashOf() {
+	void testHashOf() throws NoSuchAlgorithmException {
 		
 		// actual
 		BigInteger hash1 = Hash.hashOf("process1");
