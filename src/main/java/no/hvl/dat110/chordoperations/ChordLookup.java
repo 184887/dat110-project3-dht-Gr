@@ -18,6 +18,8 @@ import no.hvl.dat110.rpc.interfaces.NodeInterface;
 import no.hvl.dat110.util.Hash;
 import no.hvl.dat110.util.Util;
 
+import static java.math.BigInteger.ONE;
+
 /**
  * @author tdoy
  *
@@ -33,7 +35,6 @@ public class ChordLookup {
 	
 	public NodeInterface findSuccessor(BigInteger key) throws RemoteException {
 		// ask this node to find the successor of key
-		
 		// get the successor of the node
 		
 		// check that key is a member of the set {nodeid+1,...,succID} i.e. (nodeid+1 <= key <= succID) using the checkInterval
@@ -43,8 +44,23 @@ public class ChordLookup {
 		// if logic returns false; call findHighestPredecessor(key)
 		
 		// do highest_pred.findSuccessor(key) - This is a recursive call until logic returns true
-				
-		return null;					
+
+        NodeInterface succ = node.getSuccessor();
+        BigInteger nodID = node.getNodeID();
+        BigInteger succID = succ.getNodeID();
+
+
+        boolean inRage = Util.checkInterval(key,nodID.add(ONE), succID);
+
+        if (inRage){
+            return succ;
+        }else {
+
+            NodeInterface clossets = findHighestPredecessor(key);
+
+            return clossets.findSuccessor(key);
+        }
+
 	}
 	
 	/**
@@ -64,8 +80,14 @@ public class ChordLookup {
 		// check that finger is a member of the set {nodeID+1,...,ID-1} i.e. (nodeID+1 <= finger <= key-1) using the ComputeLogic
 		
 		// if logic returns true, then return the finger (means finger is the closest to key)
-		
-		return (NodeInterface) node;			
+
+        List<NodeInterface> table = node.getFingerTable();
+
+        for (int i = 0; )
+
+
+
+
 	}
 	
 	public void copyKeysFromSuccessor(NodeInterface succ) {
@@ -120,7 +142,7 @@ public class ChordLookup {
 			
 			// check that pred_new is between pred_old and this node, accept pred_new as the new predecessor
 			// check that ftsuccID is a member of the set {nodeID+1,...,ID-1}
-			boolean cond = Util.checkInterval(pred_newID, pred_oldID.add(BigInteger.ONE), nodeID.add(BigInteger.ONE));
+			boolean cond = Util.checkInterval(pred_newID, pred_oldID.add(ONE), nodeID.add(ONE));
 			if(cond) {		
 				node.setPredecessor(pred_new);		// accept the new predecessor
 			}	
