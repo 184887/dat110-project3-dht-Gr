@@ -1,0 +1,11 @@
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/SetUp.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestCheckInterval.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestFilePeers.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestFileReplicas.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestFindSuccessor.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestFingerTable.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestHashFunction.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestKeys.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestMutex.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestRemote.java
+/Users/magnusfondenes/GitHub/dat110-project3-dht-Gr/src/test/java/no/hvl/dat110/unit/tests/TestRing.java

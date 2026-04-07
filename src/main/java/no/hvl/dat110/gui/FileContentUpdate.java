@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -99,66 +100,6 @@ public class FileContentUpdate extends JFrame {
         setResizable(false);					// disable resizing of form
 	}
 	
-	public void addContentToList(String txt) {
-		
-		txtArea.setText(txt);
-	}
-	
-	private void addComponentsToFrame(GridBagConstraints constraints) {
-			
-		constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 4;
-        constraints.weightx = 1.0;
-        constraints.weighty = 0.5;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(sp, constraints);
- 
-        constraints.gridx = 2;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.weightx = 1.0;
-        constraints.weighty = 0.5;
-        constraints.fill = GridBagConstraints.NONE;
-        add(btnUpdate, constraints);
-        
-		constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.weightx = 1.0;
-        constraints.weighty = 0.5;
-        constraints.fill = GridBagConstraints.NONE;
-        add(btnClose, constraints);
-	        
-	}
-	
-	private void btnUpdateContent() {
-		
-		String newcontent = txtArea.getText();
-		
-		try {
-			Set<Message> activepeers = null;
-
-			// let's see if activepeers holding file is not null. If null, request newly
-			if(filemanager.getActiveNodesforFile() == null)
-				activepeers = filemanager.requestActiveNodesForFile(selectedpeerdata.getNameOfFile());
-			else
-				activepeers = filemanager.getActiveNodesforFile();
-
-			selectedpeer.multicastReleaseLocks(activepeers); 	// release locks 
-			boolean reply = selectedpeer.requestMutexWriteOperation(selectedpeerdata, newcontent.getBytes(), activepeers);
-
-			JOptionPane.showMessageDialog(null,"Access granted? "+reply, "Message",JOptionPane.INFORMATION_MESSAGE);
-			
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void btnCloseActionPerformed() {
-		this.dispose();
-	}
-	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -170,6 +111,68 @@ public class FileContentUpdate extends JFrame {
 				}
 			}
 		});
+	}
+	
+	public void addContentToList(String txt) {
+
+		txtArea.setText(txt);
+	}
+	
+	private void addComponentsToFrame(GridBagConstraints constraints) {
+
+		constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 4;
+        constraints.weightx = 1.0;
+        constraints.weighty = 0.5;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        add(sp, constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 1.0;
+        constraints.weighty = 0.5;
+        constraints.fill = GridBagConstraints.NONE;
+        add(btnUpdate, constraints);
+
+		constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 1.0;
+        constraints.weighty = 0.5;
+        constraints.fill = GridBagConstraints.NONE;
+        add(btnClose, constraints);
+
+	}
+
+	private void btnUpdateContent() {
+
+		String newcontent = txtArea.getText();
+
+		try {
+			Set<Message> activepeers = null;
+
+			// let's see if activepeers holding file is not null. If null, request newly
+			if(filemanager.getActiveNodesforFile() == null)
+				activepeers = filemanager.requestActiveNodesForFile(selectedpeerdata.getNameOfFile());
+			else
+				activepeers = filemanager.getActiveNodesforFile();
+
+			selectedpeer.multicastReleaseLocks(activepeers); 	// release locks
+			boolean reply = selectedpeer.requestMutexWriteOperation(selectedpeerdata, newcontent.getBytes(), activepeers);
+
+			JOptionPane.showMessageDialog(null,"Access granted? "+reply, "Message",JOptionPane.INFORMATION_MESSAGE);
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+	
+	private void btnCloseActionPerformed() {
+		this.dispose();
 	}
 	
 

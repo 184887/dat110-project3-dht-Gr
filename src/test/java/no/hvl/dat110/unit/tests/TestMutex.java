@@ -4,6 +4,7 @@ package no.hvl.dat110.unit.tests;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.rmi.RemoteException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +36,7 @@ class TestMutex {
 	}
 
 	@Test
-	void test() throws InterruptedException, RemoteException {
+	void test() throws InterruptedException, RemoteException, NoSuchAlgorithmException {
 		
 		// retrieve the processes stubs
 		NodeInterface p1 = Util.getProcessStub("process1", 9091);
@@ -90,37 +91,8 @@ class TestMutex {
 		assertArrayEquals(e.toArray(), replies.toArray());
 	}
 	
-	class FileUpdater extends Thread {
-		
-		boolean reply;
-		NodeInterface node;
-		Message peer;
-		byte[] updates;
-		Set<Message> activepeers;
-		
-		FileUpdater(NodeInterface node, Message peer, byte[] updates, Set<Message> activepeers) throws RemoteException{
-			this.node = node;
-			this.peer = peer;
-			this.updates = updates;
-			this.activepeers = activepeers;
-		}
-		
-		public void run() {
-			try {
-				reply = node.requestMutexWriteOperation(peer, updates, activepeers);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		public boolean getReply() {			
-			
-			return reply;
-		}
-	}
-	
 	private Message getPeerMessage(Set<Message> activenodes, String peer) {
-		
+
 		Message pmsg = null;
 		Iterator<Message> it = activenodes.iterator();
 		while(it.hasNext()) {
@@ -128,8 +100,37 @@ class TestMutex {
 			if(n.getNodeName().equals(peer))
 				return n;
 		}
-		
+
 		return pmsg;
+	}
+	
+	class FileUpdater extends Thread {
+
+		boolean reply;
+		NodeInterface node;
+		Message peer;
+		byte[] updates;
+		Set<Message> activepeers;
+
+		FileUpdater(NodeInterface node, Message peer, byte[] updates, Set<Message> activepeers) throws RemoteException{
+			this.node = node;
+			this.peer = peer;
+			this.updates = updates;
+			this.activepeers = activepeers;
+		}
+
+		public void run() {
+			try {
+				reply = node.requestMutexWriteOperation(peer, updates, activepeers);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public boolean getReply() {
+
+			return reply;
+		}
 	}
 
 }

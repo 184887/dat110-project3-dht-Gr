@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import no.hvl.dat110.chordoperations.ChordLookup;
+import no.hvl.dat110.middleware.Node;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,7 +82,7 @@ public class FileManager {
      * @param bytesOfFile
      * @throws RemoteException 
      */
-    public int distributeReplicastoPeers() throws RemoteException {
+    public int distributeReplicastoPeers() throws RemoteException, NoSuchAlgorithmException {
     	
     	// randomly appoint the primary server to this file replicas
     	Random rnd = new Random(); 							
@@ -105,7 +107,23 @@ public class FileManager {
     	// call the saveFileContent() on the successor and set isPrimary=true if logic above is true otherwise set isPrimary=false
     	
     	// increment counter
-		return counter;
+
+        createReplicaFiles();
+
+        for (int i = 0; i < numReplicas; i++){
+            NodeInterface successor = chordnode.findSuccessor(replicafiles[i]);
+            successor.addKey(replicafiles[i]);
+
+           boolean erPrimary = (i == index);
+
+           successor.saveFileContent(filename, replicafiles[i], bytesOfFile, erPrimary);
+
+
+           counter++;
+
+        }
+
+        return counter;
     }
 	
 	/**
@@ -114,7 +132,7 @@ public class FileManager {
 	 * @return list of active nodes having the replicas of this file
 	 * @throws RemoteException 
 	 */
-	public Set<Message> requestActiveNodesForFile(String filename) throws RemoteException {
+	public Set<Message> requestActiveNodesForFile(String filename) throws RemoteException, NoSuchAlgorithmException {
 
 		this.filename = filename;
 		activeNodesforFile = new HashSet<Message>(); 
@@ -130,7 +148,17 @@ public class FileManager {
 		// get the metadata (Message) of the replica from the successor (i.e., active peer) of the file
 		
 		// save the metadata in the set activeNodesforFile.
-		
+
+        createReplicaFiles();
+
+        for (int i = 0; i < numReplicas; i++){
+
+            NodeInterface successor = chordnode.findSuccessor(replicafiles[i]);
+            Message msg = successor.getFilesMetadata(replicafiles[i]);
+            activeNodesforFile.add(msg);
+
+        }
+
 		return activeNodesforFile;
 	}
 	
