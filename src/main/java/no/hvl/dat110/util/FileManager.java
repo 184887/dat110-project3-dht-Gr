@@ -177,7 +177,11 @@ public class FileManager {
 		// use the primaryServer boolean variable contained in the Message class to check if it is the primary or not
 		
 		// return the primary when found (i.e., use Util.getProcessStub to get the stub and return it)
-		
+       for(Message node : activeNodesforFile){
+           if (node.isPrimaryServer()){
+               return Util.getProcessStub(node.getNodeName(), node.getPort());
+           }
+       }
 		return null; 
 	}
 	
