@@ -31,6 +31,7 @@ public class MutualExclusion {
 	
 	private LamportClock clock;								// lamport clock
 	private Node node;
+    private Message myMessage;
 	
 	public MutualExclusion(Node node) throws RemoteException {
 		this.node = node;
@@ -61,7 +62,16 @@ public class MutualExclusion {
 		// adjust the clock on the message, by calling the setClock on the message
 				
 		// wants to access resource - set the appropriate lock variable
-	
+        this.myMessage = message;
+        queueack.clear();
+        mutexqueue.clear();
+
+        clock.increment();
+
+        message.setClock(clock.getClock());
+
+        WANTS_TO_ENTER_CS = true;
+
 		
 		// start MutualExclusion algorithm
 		
@@ -78,8 +88,33 @@ public class MutualExclusion {
 				// clear the mutexqueue
 		
 		// return permission
-		
-		return false;
+
+        List<Message> voters = removeDuplicatePeersBeforeVoting();
+
+        multicastMessage(message, voters);
+
+        //TODO Fare for deadlock
+        while (!areAllMessagesReturned(voters.size()) && WANTS_TO_ENTER_CS) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!WANTS_TO_ENTER_CS){
+            return false;
+        }
+
+        acquireLock();
+
+        node.broadcastUpdatetoPeers(updates);
+
+        mutexqueue.clear();
+        multicastReleaseLocks(node.activenodesforfile);
+
+        return true;
+
 	}
 	
 	// multicast message to other processes including self
@@ -92,6 +127,16 @@ public class MutualExclusion {
 		// obtain a stub for each node from the registry
 		
 		// call onMutexRequestReceived()
+
+        for(Message msg : activenodes){
+           NodeInterface stub =  Util.getProcessStub(msg.getNodeName(), msg.getPort());
+            if (stub != null){
+                stub.onMutexRequestReceived(message);
+            }else{
+            onMutexRequestReceived(message);
+            }
+        }
+
 		
 	}
 	
@@ -187,7 +232,7 @@ public class MutualExclusion {
 
                 int rClock = message.getClock();
 
-                int cClock = clock.getClock();
+                int cClock = myMessage.getClock();
 
                 if (rClock > cClock){
                     queue.add(message);
@@ -226,14 +271,21 @@ public class MutualExclusion {
 	}
 	
 	// multicast release locks message to other processes including self
-	public void multicastReleaseLocks(Set<Message> activenodes) {
+	public void multicastReleaseLocks(Set<Message> activenodes) throws RemoteException {
 		logger.info("Releasing locks from = "+activenodes.size());
 		
 		// iterate over the activenodes
 		
 		// obtain a stub for each node from the registry
 		
-		// call releaseLocks()	
+		// call releaseLocks()
+
+        for (Message msg : activenodes){
+            NodeInterface stub = Util.getProcessStub(msg.getNodeName(), msg.getPort());
+            if (stub != null) {
+                stub.releaseLocks();
+            }
+        }
 	}
 	
 	private boolean areAllMessagesReturned(int numvoters) throws RemoteException {
@@ -244,6 +296,11 @@ public class MutualExclusion {
 		// clear the queueack
 		
 		// return true if yes and false if no
+
+        if (queueack.size() == numvoters){
+            queueack.clear();
+            return true;
+        }
 		
 		return false;
 	}
